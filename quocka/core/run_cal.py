@@ -684,7 +684,12 @@ def flag_and_calibrate(
                 f"Averaging secondary cal gain solutions over {gpaver_interval} min interval..."
             )
             call(
-                    ["gpaver", f"interval={gpaver_interval}", f"vis={seccalname}", "options=scalar"],
+                [
+                    "gpaver",
+                    f"interval={gpaver_interval}",
+                    f"vis={seccalname}",
+                    "options=scalar",
+                ],
             )
 
         flag(

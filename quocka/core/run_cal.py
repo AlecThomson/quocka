@@ -673,10 +673,6 @@ def flag_and_calibrate(
         logger.info(
             "Working on source %s" % t,
         )
-        # Move on to the target!
-        call(
-            ["gpcopy", "vis=%s" % seccalname, "out=%s" % t],
-        )
         # Apply averaging to the gain solutions if requested
         if gpaver_interval > 0:
             logger.info(
@@ -690,6 +686,10 @@ def flag_and_calibrate(
                     "options=scalar",
                 ],
             )
+        # Move on to the target!
+        call(
+            ["gpcopy", "vis=%s" % seccalname, "out=%s" % t],
+        )
 
         flag(
             t,

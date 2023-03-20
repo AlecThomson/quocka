@@ -29,7 +29,6 @@ reproject = "*"
 tqdm = "*"
 aplpy = "*"
 ipython = "*"
-casatasks = "*"
 pandas = "*"
 
 [tool.poetry.group.dev.dependencies]

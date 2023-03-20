@@ -14,7 +14,6 @@ import numpy as np
 from astropy.io import fits
 from astropy.table import Table
 from braceexpand import braceexpand
-from casatasks import importuvfits, importmiriad
 from dask import compute, delayed
 from dask.distributed import Client
 from IPython import embed
@@ -51,55 +50,6 @@ class QuockaSources(NamedTuple):
     seccalnames: list
     polcalnames: list
     targetnames: list
-
-@delayed()
-def convert_to_ms(
-        vis: str,
-        outdir: str,
-    ) -> str:
-    """Convert a uvfits file to a measurement set
-
-    Args:
-        vis (str): Visibility file to convert
-    """
-    # Now in outdir
-    os.chdir(outdir)
-
-    logger.critical(f"Converting {vis} to ms")
-    logger.critical("This is experimental and may not work as expected!")
-
-    # OPTION 1: Convert vis to uvfits - convert uvfits to ms
-    # Convert vis to uvfits
-    uvfits = f"{vis}.uv"
-    call(
-        [
-            "fits",
-            f"in={vis}",
-            f"out={uvfits}",
-            "op=uvout",
-        ],
-    )
-    # Convert uvfits to ms
-    ms = f"{uvfits}.ms"
-    if os.path.exists(ms):
-        logger.warning(f"Removing {ms}")
-        shutil.rmtree(ms)
-    importuvfits(
-        fitsfile=uvfits,
-        vis=ms,
-    )
-
-     # OPTION 2: Convert vis to ms directly
-    ms = f"{vis}.ms"
-    if os.path.exists(ms):
-        logger.warning(f"Removing {ms}")
-        shutil.rmtree(ms)
-
-    importmiriad(
-        mirfile=vis,
-        vis=ms,
-    )
-    return ms
 
 
 def single_compute(*args, **kwargs):

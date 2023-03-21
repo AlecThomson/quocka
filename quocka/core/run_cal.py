@@ -624,6 +624,7 @@ def secondary_cal(
     N_S_ROUNDS: int,
     NFBIN: int,
     outdir: str,
+    gpaver_interval: float = 0,
 ) -> str:
     """Derive the gain and phase calibration for the secondary calibrator
 
@@ -682,6 +683,19 @@ def secondary_cal(
     call(
         ["gpboot", "vis=%s" % seccalname, "cal=%s" % pricalname],
     )
+    # Apply averaging to the gain solutions if requested
+    if gpaver_interval > 0:
+        logger.info(
+            f"Averaging secondary cal gain solutions over {gpaver_interval} min interval..."
+        )
+        call(
+            [
+                "gpaver",
+                f"interval={gpaver_interval}",
+                f"vis={seccalname}",
+                "options=scalar",
+            ],
+        )
     # Plot results after boot
     call(
         [
@@ -736,7 +750,6 @@ def merge_secondary_cals(
     logger.info(
         "Using gains from %s ..." % (seccalname),
     )
-
     return seccalname
 
 
@@ -746,7 +759,6 @@ def target_cal(
     seccalname: str,
     outdir: str,
     clobber: bool = False,
-    gpaver_interval: float = 0,
 ) -> str:
     """Apply the calibration to the target
 
@@ -762,19 +774,6 @@ def target_cal(
     logger.info(
         "Working on source %s" % target,
     )
-    # Apply averaging to the gain solutions if requested
-    if gpaver_interval > 0:
-        logger.info(
-            f"Averaging secondary cal gain solutions over {gpaver_interval} min interval..."
-        )
-        call(
-            [
-                "gpaver",
-                f"interval={gpaver_interval}",
-                f"vis={seccalname}",
-                "options=scalar",
-            ],
-        )
     call(
         ["gpcopy", "vis=%s" % seccalname, "out=%s" % target],
     )
@@ -856,6 +855,7 @@ def main(
                 N_S_ROUNDS=config.N_S_ROUNDS,
                 NFBIN=config.NFBIN,
                 outdir=config.outdir,
+                gpaver_interval=config.gpaver_interval,
             )
             secal_list.append(secalname_cal)
 
@@ -875,7 +875,6 @@ def main(
                 seccalname=merged_cal,
                 outdir=config.outdir,
                 clobber=config.outclobber,
-                gpaver_interval=config.gpaver_interval,
             )
             if config.convert_ms:
                 targetname_ms = convert_to_ms(
